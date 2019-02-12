@@ -38,7 +38,7 @@ public class Methods implements DataUtil, FileUtil {
         this.passengersNumberForBooking = passengersNumberForBooking;
     }
 
-    void method10_displayingOnlineTable() {
+    void method10_displayingOnlineTable(String origin) {
 
         final String PRINT_FORMAT = "| %-7s | %-10s | %-5s | %-30s | %8s |\n";
         final String DASHES = new String(new char[76]).replace("\0", "-");
@@ -52,13 +52,13 @@ public class Methods implements DataUtil, FileUtil {
         System.out.printf(PRINT_FORMAT, "Flight", "Date", "Time", "Destination", "Duration");
         System.out.printf("%s\n", DASHES);
 
-        flightsController.printAllSortedCurrent24Hours(PRINT_FORMAT);
+        flightsController.printAllSortedCurrent24Hours(origin, PRINT_FORMAT);
 
         System.out.printf("%s\n", DASHES);
 
     }
 
-    void method20_displayFlightInformation() {
+    void method20_displayFlightInformation(String origin) {
 
         String flightNumber = parseAndValidateInputString(
                 "Enter Flight number: ",
@@ -66,7 +66,7 @@ public class Methods implements DataUtil, FileUtil {
                 "Flight number",
                 "PS0779");
 
-        Flight flight = flightsController.getByFlightNumber(flightNumber);
+        Flight flight = flightsController.getByFlightNumber(origin, flightNumber);
 
         if (flight != null) {
 
@@ -74,11 +74,11 @@ public class Methods implements DataUtil, FileUtil {
 
         } else
 
-            System.out.println("Sorry, there is no flight " + flightNumber + " in the db.");
+            System.out.printf("Sorry, there is no flight \'%s\' in the db for origin \'%s\'.\n", flightNumber, origin);
 
     }
 
-    List<Flight> method30_searchFlights() {
+    List<Flight> method30_searchFlights(String origin) {
         System.out.println("Search flights...");
 
         String destination = parseAndValidateInputString(
@@ -99,7 +99,7 @@ public class Methods implements DataUtil, FileUtil {
                 flightsController.getMaxSeatNumber());
 
         passengersNumberForBooking = number;
-        return flightsController.getFlightsMatchedCriteria(destination, date, number);
+        return flightsController.getFlightsMatchedCriteria(origin, destination, date, number);
 
     }
 
@@ -207,8 +207,19 @@ public class Methods implements DataUtil, FileUtil {
         LocalTime currentTime = LocalTime.now(ZoneId.of(TIME_ZONE));
         LocalDate currentDate = LocalDate.now(ZoneId.of(TIME_ZONE));
 
+        method72_readScheduleFile(KBP_SCHEDULE_FILE_PATH, "Kiev Boryspil", currentDate, currentTime);
+        method72_readScheduleFile(FRA_SCHEDULE_FILE_PATH, "Frankfurt", currentDate, currentTime);
+        method72_readScheduleFile(KATOWICE_SCHEDULE_FILE_PATH, "Katowice", currentDate, currentTime);
+
+    }
+
+    private void method72_readScheduleFile(String scheduleFilePath, String origin, LocalDate localDate, LocalTime licalTime ) {
+
+        LocalTime currentTime = LocalTime.now(ZoneId.of(TIME_ZONE));
+        LocalDate currentDate = LocalDate.now(ZoneId.of(TIME_ZONE));
+
         try (
-                Reader reader = Files.newBufferedReader(Paths.get(KBP_SCHEDULE_FILE_PATH));
+                Reader reader = Files.newBufferedReader(Paths.get(scheduleFilePath));
                 CSVReader csvReader = new CSVReader(reader, ',', '\'', 1);
         ) {
 
@@ -234,7 +245,7 @@ public class Methods implements DataUtil, FileUtil {
                         new Flight(nextRecord[0],
                                 departureDateTimeLong,
                                 flightDurationTimeLong,
-                                "Kiev Boryspil",
+                                origin,
                                 nextRecord[2],
                                 150
                         ));

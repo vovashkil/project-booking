@@ -1,0 +1,17 @@
+Flight,Time,Destination,Carrier,Terminal,Gate,Status,Duration
+LO3880,05:30,Warsaw,,,,Scheduled,01:50
+W61091,06:00,Dortmund,,,,Scheduled,01:50
+W61011,06:05,Liverpool,,,,Scheduled,01:50
+LH1363,06:15,Frankfurt,,,,Scheduled,01:50
+W61001,06:25,London - Luton,,,,Scheduled,01:50
+W61221,06:45,Stavanger,,,,Scheduled,01:50
+W61071,07:10,Eindhoven,,,,Scheduled,01:50
+3Z7100,08:00,Marsa Alam,,,,Scheduled,01:50
+E45395,08:05,Las Palmas,,,,Scheduled,01:50
+E47423,08:05,Mombasa,,,,Scheduled,01:50
+W61167,17:05,Reykjavik - Keflavik,,,,Scheduled,01:50
+LO3886,18:15,Warsaw,,,,Scheduled,01:50
+W61005,18:40,London - Luton,,,,Scheduled,01:50
+LH1361,18:50,Frankfurt,,,,Scheduled,01:50
+W61015,19:05,Doncaster–Sheffield,,,,Scheduled,01:50
+FR1254,21:30,Birmingham,,,,Scheduled,01:50

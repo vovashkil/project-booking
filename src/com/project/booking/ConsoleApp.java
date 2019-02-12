@@ -1,10 +1,7 @@
 package com.project.booking;
 
 import com.project.booking.Booking.*;
-import com.project.booking.Constants.DataUtil;
-import com.project.booking.Constants.FileUtil;
-import com.project.booking.Constants.PersonType;
-import com.project.booking.Constants.Sex;
+import com.project.booking.Constants.*;
 import com.project.booking.Controllers.BookingController;
 import com.project.booking.Controllers.CustomerController;
 import com.project.booking.Controllers.FlightController;
@@ -60,16 +57,16 @@ class ConsoleApp implements FileUtil, DataUtil {
             switch (choice) {
                 case 1:
                     System.out.println("Displaying online table...");
-                    m.method10_displayingOnlineTable();
+                    m.method10_displayingOnlineTable(Airports.KBP.getName());
                     break;
                 case 2:
                     System.out.println("Displaying flight information...");
-                    m.method20_displayFlightInformation();
+                    m.method20_displayFlightInformation(Airports.KBP.getName());
                     break;
                 case 3:
                     System.out.println("Flight search and booking...");
 
-                    List<Flight> searchResult = m.method30_searchFlights();
+                    List<Flight> searchResult = m.method30_searchFlights(Airports.KBP.getName());
 
                     if (searchResult.size() == 0) {
                         System.out.println("Sorry, no flight matching the criteria found. Repeat yor search.");

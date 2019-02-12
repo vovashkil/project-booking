@@ -2,12 +2,10 @@ package com.project.booking.Controllers;
 
 import com.project.booking.Booking.Flight;
 import com.project.booking.Constants.DataUtil;
-import com.project.booking.Methods;
 import com.project.booking.Services.FlightService;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.booking.Constants.ComUtil.dateLongToString;
@@ -70,10 +68,11 @@ public class FlightController implements DataUtil {
 
     }
 
-    public void printAllSortedCurrent24Hours(String format) {
+    public void printAllSortedCurrent24Hours(String origin, String format) {
 
         flightService.getAllFlights()
                 .stream()
+                .filter(flight -> origin.equals(flight.getOrigin()))
                 .sorted(Comparator.comparingLong(Flight::getDepartureDateTime))
                 .forEach(flight -> printFlight(flight, format)
                 );
@@ -92,12 +91,14 @@ public class FlightController implements DataUtil {
 
     }
 
-    public Flight getByFlightNumber(String flightNumber) {
+    public Flight getByFlightNumber(String origin, String flightNumber) {
 
         return flightService.getAllFlights()
                 .stream()
                 .filter(item -> item.getFlightNumber()
-                        .equalsIgnoreCase(flightNumber)).findFirst().orElse(null);
+                        .equalsIgnoreCase(flightNumber)
+                        && origin.equals(item.getOrigin()))
+                .findFirst().orElse(null);
 
     }
 
@@ -111,13 +112,14 @@ public class FlightController implements DataUtil {
 
     }
 
-    public List<Flight> getFlightsMatchedCriteria(String destination, String date, int passengersNumber) {
+    public List<Flight> getFlightsMatchedCriteria(String origin, String destination, String date, int passengersNumber) {
 
         return
                 flightService.getAllFlights()
                         .stream()
                         .filter(
-                                item -> item.getDestination().equalsIgnoreCase(destination) &&
+                                item -> origin.equalsIgnoreCase(item.getOrigin()) &&
+                                        item.getDestination().equalsIgnoreCase(destination) &&
                                         item.getDepartureDateTime() > parseDate(date) &&
                                         ((item.getMaxNumSeats() - item.getPassengersOnBoard()) >= passengersNumber)
                         )
