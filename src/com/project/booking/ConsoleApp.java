@@ -66,7 +66,7 @@ class ConsoleApp implements FileUtil, DataUtil {
                 case 3:
                     System.out.println("Flight search and booking...");
 
-                    List<Flight> searchResult = m.method30_searchFlights(Airports.KBP.getName());
+                    List<List<Flight>> searchResult = m.method30_searchFlights(Airports.KBP.getName());
 
                     if (searchResult.size() == 0) {
                         System.out.println("Sorry, no flight matching the criteria found. Repeat yor search.");
@@ -208,7 +208,7 @@ class ConsoleApp implements FileUtil, DataUtil {
 
     }
 
-    private void printSearchFlightsdResultMenu(List<Flight> flights, Methods m) {
+    private void printSearchFlightsdResultMenu(List<List<Flight>> flights, Methods m) {
 
         System.out.println("Found flights matched criteria...");
 

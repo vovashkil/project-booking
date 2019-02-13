@@ -78,7 +78,7 @@ public class Methods implements DataUtil, FileUtil {
 
     }
 
-    List<Flight> method30_searchFlights(String origin) {
+    List<List<Flight>> method30_searchFlights(String origin) {
         System.out.println("Search flights...");
 
         String destination = parseAndValidateInputString(
@@ -103,25 +103,25 @@ public class Methods implements DataUtil, FileUtil {
 
     }
 
-    void method32_makingBooking(Flight flight, Customer customer) {
+    void method32_makingBooking(List<Flight> flights, Customer customer) {
 
         System.out.println("Booking...");
-        method001_displayingFlightInformation(flight);
+        flights.forEach(this::method001_displayingFlightInformation);
 
-        Booking booking = method34_createBooking(flight, customer, passengersNumberForBooking);
+        Booking booking = method34_createBooking(flights, customer, passengersNumberForBooking);
 
         if (booking != null) method005_displayBookingInfo(booking);
 
     }
 
-    private Booking method34_createBooking(Flight flight, Customer customer, int passengersNumber) {
+    private Booking method34_createBooking(List<Flight> flights, Customer customer, int passengersNumber) {
         System.out.println("Creating booking...");
         Booking result = null;
 
-        if (flight != null && passengersNumber > 0) {
+        if (flights != null && passengersNumber > 0) {
 
             result = bookingsController
-                    .createBooking(flight,
+                    .createBooking(flights,
                             customer,
                             method36_createPassengersList(passengersNumber)
                     );
@@ -297,12 +297,12 @@ public class Methods implements DataUtil, FileUtil {
 
     }
 
-    void method003_printMultipleFlightsWithOrderNumbers(List<Flight> flights, String format) {
+    void method003_printMultipleFlightsWithOrderNumbers(List<List<Flight>> flights, String format) {
 
         if (flights.size() > 0)
             flights.forEach(flight -> {
                 System.out.print(flights.indexOf(flight) + +1 + ". ");
-                method002_printFlight(flight, format);
+                flight.forEach(item->method002_printFlight(item, format));
             });
 
     }
@@ -387,7 +387,9 @@ public class Methods implements DataUtil, FileUtil {
         System.out.printf("%s\n", DASHES);
         method006_printBooking(booking, PRINT_FORMAT);
         System.out.printf("%s\n", DASHES);
-        method001_displayingFlightInformation(booking.getFlight());
+
+        booking.getFlights().forEach(this::method001_displayingFlightInformation);
+
         System.out.printf(PRINT_PASSENGER_FORMAT, "Number", "Passenger Info", "Sex", "Date Of Birth", "Passport Number");
         System.out.printf("%s\n", DASHES);
 

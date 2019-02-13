@@ -4,6 +4,7 @@ import com.project.booking.Booking.Flight;
 import com.project.booking.Constants.DataUtil;
 import com.project.booking.Services.FlightService;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -112,20 +113,58 @@ public class FlightController implements DataUtil {
 
     }
 
-    public List<Flight> getFlightsMatchedCriteria(String origin, String destination, String date, int passengersNumber) {
+    public List<List<Flight>> getFlightsMatchedCriteria(String origin, String destination, String date, int passengersNumber) {
 
-        return
-                flightService.getAllFlights()
-                        .stream()
-                        .filter(
-                                item -> origin.equalsIgnoreCase(item.getOrigin()) &&
-                                        item.getDestination().equalsIgnoreCase(destination) &&
-                                        item.getDepartureDateTime() > parseDate(date) &&
-                                        ((item.getMaxNumSeats() - item.getPassengersOnBoard()) >= passengersNumber)
-                        )
-                        .sorted(Comparator.comparingLong(Flight::getDepartureDateTime))
-                        .collect(Collectors.toList());
+        List<List<Flight>> result = new ArrayList<>();
+        int i = 0;
 
+        List<Flight> singleFlights = flightService.getAllFlights()
+                .stream()
+                .filter(
+                        item -> origin.equalsIgnoreCase(item.getOrigin()) &&
+                                item.getDestination().equalsIgnoreCase(destination) &&
+                                item.getDepartureDateTime() > parseDate(date) &&
+                                ((item.getMaxNumSeats() - item.getPassengersOnBoard()) >= passengersNumber)
+                )
+                .sorted(Comparator.comparingLong(Flight::getDepartureDateTime))
+                .collect(Collectors.toList());
+
+        singleFlights.forEach(flight -> {
+
+            List<Flight> connectingFlights = new ArrayList<>();
+            connectingFlights.add(flight);
+            result.add(connectingFlights);
+
+        });
+
+        flightService.getAllFlights().stream()
+                .filter(flight -> origin.equalsIgnoreCase(
+                        flight.getOrigin()) &&
+                        !destination.equalsIgnoreCase(flight.getDestination()) &&
+                        flight.getDepartureDateTime() > parseDate(date) &&
+                        ((flight.getMaxNumSeats() - flight.getPassengersOnBoard()) >= passengersNumber)
+                )
+                .forEach(flight -> {
+                    flightService.getAllFlights().stream()
+                            .filter(connectingFlight ->
+                                    destination.equalsIgnoreCase(connectingFlight.getDestination()) &&
+                                            flight.getDestination().equalsIgnoreCase(connectingFlight.getOrigin()) &&
+                                            connectingFlight.getDepartureDateTime() > flight.getDepartureDateTime()
+//                                            connectingFlight.getDepartureDateTime() > (flight.getDepartureDateTime() + flight.getEstFlightDuration()) &&
+//                                            connectingFlight.getDepartureDateTime() < (flight.getDepartureDateTime() + flight.getEstFlightDuration() + 12 * 60 * 60 * 1000) &&
+//                                            ((connectingFlight.getMaxNumSeats() - connectingFlight.getPassengersOnBoard()) >= passengersNumber)
+
+                            ).forEach(connectingFlight -> {
+
+                        List<Flight> connectingFlights = new ArrayList<>();
+                        connectingFlights.add(flight);
+                        connectingFlights.add(connectingFlight);
+                        result.add(connectingFlights);
+
+                    });
+                });
+
+        return result;
 
     }
 
