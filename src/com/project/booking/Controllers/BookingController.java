@@ -83,13 +83,13 @@ public class BookingController {
 
     }
 
-    public Booking createBooking(Flight flight, Customer customer, List<Person> passengers) {
+    public Booking createBooking(List<Flight> flights, Customer customer, List<Person> passengers) {
         Booking result = null;
 
-        if (flight != null && customer != null && passengers.size() > 0) {
+        if (flights != null && customer != null && passengers.size() > 0) {
 
-            result = new Booking(flight, customer, passengers);
-            passengers.forEach(flight::addPassenger);
+            result = new Booking(flights, customer, passengers);
+            passengers.forEach(passenger->flights.forEach(flight->flight.addPassenger(passenger)));
             saveBooking(result);
         }
 
@@ -101,7 +101,7 @@ public class BookingController {
         Booking booking = getBookingByBookingNumber(bookingNumber);
         if (booking != null) {
 
-            booking.getPassengers().forEach(booking.getFlight()::deletePassenger);
+            booking.getPassengers().forEach(passenger->booking.getFlights().forEach(flight->flight.deletePassenger(passenger)));
             deleteBookingByObject(booking);
 
         }

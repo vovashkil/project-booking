@@ -14,17 +14,17 @@ public class Booking implements DataUtil, Serializable {
     private final LocalDateTime dateTime = LocalDateTime.now();
     private Customer customer;
     private List<Person> passengers = new ArrayList();
-    private Flight flight;
+    private List<Flight> flights = new ArrayList<>();
 
-    public Booking(Flight flight) {
+    public Booking(List<Flight> flights) {
 
         this.number = setBookingNumber();
-        this.flight = flight;
+        this.flights = flights;
     }
 
-    public Booking(Flight flight, final Customer customer, List<Person> passengers) {
+    public Booking(List<Flight> flights, final Customer customer, List<Person> passengers) {
         this.number = setBookingNumber();
-        this.flight = flight;
+        this.flights = flights;
         this.setCustomer(customer);
         this.setPassengers(passengers);
     }
@@ -64,12 +64,12 @@ public class Booking implements DataUtil, Serializable {
         this.passengers = passengers;
     }
 
-    public Flight getFlight() {
-        return flight;
+    public List<Flight> getFlights() {
+        return flights;
     }
 
-    public void setFlight(Flight flight) {
-        this.flight = flight;
+    public void setFlight(List<Flight> flights) {
+        this.flights = flights;
     }
 
     public boolean addPassenger(Person passenger) {
@@ -157,7 +157,7 @@ public class Booking implements DataUtil, Serializable {
                 ", dateTime='" + dateTime.format(DateTimeFormatter
                                 .ofPattern(DATE_TIME_FORMAT)) + '\'' +
                 ", customer=" + customer +
-                ",\n\t flight=" + flight +
+                ",\n\t flight=" + flights +
                 ",\n\t\t passengers=" + passengers +
                 '}';
     }
