@@ -1,5 +1,6 @@
 package com.project.booking.Console;
 
+import com.project.booking.Constants.Airports;
 import com.project.booking.Controllers.Storage;
 
 import java.time.LocalDateTime;
@@ -41,10 +42,9 @@ public class CmdShow extends CommandBase implements Command {
         System.out.printf(PRINT_FORMAT, "Flight", "Date", "Time", "Destination", "Duration");
         System.out.printf("%s\n", DASHES);
 
-        storage.getFlights().printAllSortedCurrent24Hours(PRINT_FORMAT);
+        storage.getFlights().printAllSortedCurrent24Hours(Airports.KBP.getName(), PRINT_FORMAT);
 
         System.out.printf("%s\n", DASHES);
-
     }
 
     @Override

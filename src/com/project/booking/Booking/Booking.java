@@ -73,62 +73,43 @@ public class Booking implements DataUtil, Serializable {
     }
 
     public boolean addPassenger(Person passenger) {
-
         if (!passengers.contains(passenger) &&
                 passenger != null) {
-
             passengers.add(passenger);
             return true;
-
         } else
-
             return false;
-
     }
 
     public boolean deletePassenger(Person passenger) {
-
         if (!passengers.contains(passenger)) return false;
 
         passengers.remove(passenger);
         return true;
-
     }
 
     public boolean deletePassenger(int index) {
-
         if (index >= 0 && index < passengers.size()) {
-
             if (!passengers.contains(passengers.get(index))) return false;
 
             passengers.remove(passengers.get(index));
             return true;
-
         }
-
         return false;
     }
 
     public Person createPerson(String name, String surname, long birthdate, Sex sex, String... args) {
-
         Person result = null;
 
         if (args.length == 1) {
-
             result = new Passenger(name, surname, birthdate, sex, args[0]);
             addPassenger(result);
-
         }
-
         if (args.length == 2) {
-
             result = new Customer(name, surname, birthdate, sex, args[0], args[1]);
             setCustomer((Customer) result);
-
         }
-
         return result;
-
     }
 
     @Override
@@ -141,7 +122,6 @@ public class Booking implements DataUtil, Serializable {
 
     @Override
     public int hashCode() {
-
         int result = 11;
         int coef = 31;
 
@@ -155,12 +135,10 @@ public class Booking implements DataUtil, Serializable {
         return "Booking{" +
                 "number=" + number +
                 ", dateTime='" + dateTime.format(DateTimeFormatter
-                                .ofPattern(DATE_TIME_FORMAT)) + '\'' +
+                .ofPattern(DATE_TIME_FORMAT)) + '\'' +
                 ", customer=" + customer +
                 ",\n\t flight=" + flights +
                 ",\n\t\t passengers=" + passengers +
                 '}';
     }
-
 }
-

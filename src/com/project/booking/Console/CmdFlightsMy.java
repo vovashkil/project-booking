@@ -46,6 +46,7 @@ public class CmdFlightsMy extends CommandBase implements Command {
         String name = storage.getUser().getName();
         String surname = storage.getUser().getSurname();
 
+
         List<Booking> bookings = storage.getBookings().getAllBookingsByNameAndSurname(name, surname);
         if (bookings.size() > 0 ) {
             bookings.forEach(booking -> storage.getBookings().displayBookingInfo(booking));

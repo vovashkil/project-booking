@@ -112,16 +112,12 @@ public class Flight implements DataUtil, Serializable {
     }
 
     public boolean deletePassenger(int index) {
-
         if (index >= 0 && index < passengers.size()) {
-
             if (!passengers.contains(passengers.get(index))) return false;
 
             passengers.remove(passengers.get(index));
             return true;
-
         }
-
         return false;
     }
 
@@ -177,6 +173,5 @@ public class Flight implements DataUtil, Serializable {
                         .format(DateTimeFormatter
                                 .ofPattern(TIME_FORMAT)) + " | " +
                 destination;
-
     }
 }

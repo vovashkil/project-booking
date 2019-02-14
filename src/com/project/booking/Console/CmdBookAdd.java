@@ -1,6 +1,7 @@
 package com.project.booking.Console;
 
 import com.project.booking.Booking.Flight;
+import com.project.booking.Constants.Airports;
 import com.project.booking.Controllers.Storage;
 
 import java.util.InputMismatchException;
@@ -29,11 +30,11 @@ public class CmdBookAdd extends CommandBase implements Command {
     @Override
     public void doCommand() {
         log.info(String.format("%s executing", this.text()));
-        System.out.println("Flight search and booking...");
 
+        System.out.println("Flight search and booking...");
         Scanner input = new Scanner(System.in);
 
-        List<Flight> searchResult = storage.getFlights().searchFlightsForBooking();
+        List<List<Flight>> searchResult = storage.getFlights().searchFlightsForBooking(Airports.KBP.getName());
 
         if (searchResult.size() != 0) {
             boolean controlSearchAndBooking = true;
@@ -62,7 +63,8 @@ public class CmdBookAdd extends CommandBase implements Command {
                             "Your choice is wrong. Please enter the flight order number [1-" +
                                     searchResult.size() + "] to book or 0 to return.");
             }
-        } else {
+        }
+        else{
             System.out.println("Sorry, no flight matching the criteria found. Repeat yor search.");
         }
     }

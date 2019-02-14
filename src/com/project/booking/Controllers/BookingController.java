@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.project.booking.Constants.ComUtil.dateLongToString;
@@ -27,51 +29,35 @@ public class BookingController {
     }
 
     public void displayAllBookings() {
-
         bookingService.displayAllBookings();
-
     }
 
     public void saveBooking(Booking booking) {
-
         bookingService.saveBooking(booking);
-
     }
 
     public void saveData(String filePath) {
-
         bookingService.saveData(filePath);
-
     }
 
     public void readData(String filePath) {
-
         bookingService.readData(filePath);
-
     }
 
     public void deleteBookingByIndex(int index) {
-
         bookingService.deleteBookingByIndex(index);
-
     }
 
     public void deleteBookingByObject(Booking booking) {
-
         bookingService.deleteBookingByObject(booking);
-
     }
 
     public int count() {
-
         return bookingService.count();
-
     }
 
     public Booking getBookingById(int index) {
-
         return bookingService.getBookingById(index);
-
     }
 
     public Booking getBookingByBookingNumber(long bookingNumber) {
@@ -80,36 +66,28 @@ public class BookingController {
                 .stream()
                 .filter(booking -> booking.getBookingNumber() == bookingNumber)
                 .findAny().orElse(null);
-
     }
 
     public Booking createBooking(List<Flight> flights, Customer customer, List<Person> passengers) {
         Booking result = null;
 
         if (flights != null && customer != null && passengers.size() > 0) {
-
             result = new Booking(flights, customer, passengers);
             passengers.forEach(passenger->flights.forEach(flight->flight.addPassenger(passenger)));
             saveBooking(result);
         }
-
         return result;
     }
 
     public void cancelBooking(long bookingNumber) {
-
         Booking booking = getBookingByBookingNumber(bookingNumber);
         if (booking != null) {
-
             booking.getPassengers().forEach(passenger->booking.getFlights().forEach(flight->flight.deletePassenger(passenger)));
             deleteBookingByObject(booking);
-
         }
-
     }
 
     public List<Booking> getAllBookingsByNameAndSurname(String name, String surname) {
-
         return
                 bookingService.getAllBookings().stream()
                         .filter(x ->
@@ -118,7 +96,6 @@ public class BookingController {
                                         || x.getCustomer().getName().equalsIgnoreCase(name)
                                         && x.getCustomer().getSurname().equalsIgnoreCase(surname))
                         .collect(Collectors.toList());
-
     }
 
     private boolean bookingContainsPassengerWithName(Booking booking, String name) {
@@ -144,10 +121,13 @@ public class BookingController {
         return result;
     }
 
-    public void makingBooking(Flight flight, Customer customer, int passengersNumberForBooking) {
-        flightController.displayFlightInformationWithSeats(flight); //method001_displayingFlightInformation(flight);
-        if (flight != null && passengersNumberForBooking > 0) {
-            Booking booking = createBooking(flight, customer, createPassengersListForBooking(passengersNumberForBooking));
+    public void makingBooking(List<Flight> flights, Customer customer, int passengersNumberForBooking) {
+        AtomicInteger index = new AtomicInteger();
+        flights.forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), flights.size()));
+
+        if (flights.size() > 0 && passengersNumberForBooking > 0) {
+            Booking booking = createBooking(flights, customer, createPassengersListForBooking(passengersNumberForBooking));
+
             if (booking != null) {
                 displayBookingInfo(booking);
             }
@@ -167,7 +147,6 @@ public class BookingController {
     }
 
     public void displayBookingInfo(Booking booking) {
-
         final String PRINT_FORMAT = "| %-15s | %-18s | %-20s | %-19s | %6s |\n";
         final String PRINT_PASSENGER_FORMAT = "| %-7s | %-30s | %-6s | %-15s | %-20s |\n";
         final String DASHES = new String(new char[94]).replace("\0", "-");
@@ -179,9 +158,12 @@ public class BookingController {
         System.out.printf("%s\n", DASHES);
         System.out.printf(PRINT_FORMAT, "BookingNumber", "Date and Time", "Customer Info", "E-mail", "Count");
         System.out.printf("%s\n", DASHES);
-        printBooking(booking, PRINT_FORMAT);//method006_printBooking(booking, PRINT_FORMAT);
+        printBooking(booking, PRINT_FORMAT);
         System.out.printf("%s\n", DASHES);
-        flightController.displayFlightInformationWithSeats(booking.getFlight());////method001_displayingFlightInformation(booking.getFlight());
+
+        AtomicInteger index = new AtomicInteger();
+        booking.getFlights().forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), booking.getFlights().size()));
+
         System.out.printf(PRINT_PASSENGER_FORMAT, "Number", "Passenger Info", "Sex", "Date Of Birth", "Passport Number");
         System.out.printf("%s\n", DASHES);
 

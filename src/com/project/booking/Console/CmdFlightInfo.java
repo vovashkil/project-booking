@@ -1,6 +1,7 @@
 package com.project.booking.Console;
 
 import com.project.booking.Booking.Flight;
+import com.project.booking.Constants.Airports;
 import com.project.booking.Controllers.Storage;
 
 import java.util.logging.Logger;
@@ -33,10 +34,10 @@ public class CmdFlightInfo extends CommandBase implements Command {
                 "Flight number",
                 "PS0779");
 
-        Flight flight = storage.getFlights().getByFlightNumber(flightNumber);
+        Flight flight = storage.getFlights().getByFlightNumber(Airports.KBP.getName(), flightNumber);
 
         if (flight != null) {
-            storage.getFlights().displayFlightInformationWithSeats(flight);
+            storage.getFlights().displayFlightInformationWithSeats(flight, 1, 1);
         } else {
             System.out.println("Sorry, there is no flight " + flightNumber + " in the data.");
             log.warning(String.format("No Information found about this flight: %s", flightNumber));
