@@ -5,8 +5,13 @@ import com.project.booking.Booking.Flight;
 import com.project.booking.Logger.FlightLogger;
 
 import java.io.*;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.project.booking.Constants.ComUtil.dateTimeToLong;
+import static com.project.booking.Constants.ComUtil.parseTime;
+import static com.project.booking.Constants.DataUtil.TIME_ZONE;
 
 public class CollectionFlightDAO implements DAO<Flight> {
 
@@ -143,9 +148,37 @@ public class CollectionFlightDAO implements DAO<Flight> {
     public void loadData(List<Flight> flightsLoaded) {
         logger.info("Loading flights info db...");
 
-        if (flightsLoaded != null)
+        if (flightsLoaded != null) {
 
-            flightsLoaded.forEach(this::save);
+            LocalTime currentTime = LocalTime.now(ZoneId.of(TIME_ZONE));
+            LocalDate currentDate = LocalDate.now(ZoneId.of(TIME_ZONE));
+            ZoneOffset zoneOffset = currentDate.atStartOfDay(ZoneId.of(TIME_ZONE)).getOffset();
+
+            flightsLoaded.forEach(flight -> {
+
+                LocalDate flightDepartureDate = currentDate;
+                LocalTime flightDepartureTime = Instant
+                        .ofEpochMilli(flight.getDepartureDateTime())
+                        .atOffset(zoneOffset)
+                        .toLocalTime();
+
+                if (flightDepartureTime.isBefore(currentTime)) {
+
+                    flightDepartureDate = currentDate.plusDays(1);
+
+                }
+
+                long departureDateTimeLong = LocalDateTime.of(
+                        flightDepartureDate,
+                        flightDepartureTime
+                ).toInstant(zoneOffset).toEpochMilli();
+
+                flight.setDepartureDateTime(departureDateTimeLong);
+                this.save(flight);
+
+            });
+        }
+
     }
 
 }

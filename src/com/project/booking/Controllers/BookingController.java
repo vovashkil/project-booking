@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.project.booking.Constants.ComUtil.dateLongToString;
@@ -123,7 +122,7 @@ public class BookingController {
 
     public void makingBooking(List<Flight> flights, Customer customer, int passengersNumberForBooking) {
         AtomicInteger index = new AtomicInteger();
-        flights.forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), flights.size()));
+        flights.forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), flights.size(), ""));
 
         if (flights.size() > 0 && passengersNumberForBooking > 0) {
             Booking booking = createBooking(flights, customer, createPassengersListForBooking(passengersNumberForBooking));
@@ -143,6 +142,7 @@ public class BookingController {
                     booking.getCustomer().getName().concat(" ").concat(booking.getCustomer().getSurname()),
                     booking.getCustomer().getLoginName(),
                     booking.getPassengers().size());
+
         }
     }
 
@@ -162,7 +162,7 @@ public class BookingController {
         System.out.printf("%s\n", DASHES);
 
         AtomicInteger index = new AtomicInteger();
-        booking.getFlights().forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), booking.getFlights().size()));
+        booking.getFlights().forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), booking.getFlights().size(),""));
 
         System.out.printf(PRINT_PASSENGER_FORMAT, "Number", "Passenger Info", "Sex", "Date Of Birth", "Passport Number");
         System.out.printf("%s\n", DASHES);
@@ -176,6 +176,34 @@ public class BookingController {
                             dateLongToString(person.getBirthDate(), DataUtil.DATE_FORMAT),
                             ((Passenger) person).getPassportNumber());
                     System.out.printf("%s\n", DASHES);
+                });
+    }
+
+    public void printBookingInfo(Booking booking, String bookingFormat) {
+
+        final String PRINT_FORMAT_PREFIX = "   ";
+        final String PRINT_PASSENGER_FORMAT = PRINT_FORMAT_PREFIX.concat("| %-7s | %-30s | %-6s | %-15s | %-20s |\n");
+        final String PRINT_FORMAT_DASHES = "%s\n";
+        final String DASHES = new String(new char[94]).replace("\0", "-");
+
+        printBooking(booking, bookingFormat);
+        System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT_DASHES), DASHES);
+
+        AtomicInteger index = new AtomicInteger();
+        booking.getFlights().forEach(flight -> flightController.displayFlightInformationWithSeats(flight, index.addAndGet(1), booking.getFlights().size(),PRINT_FORMAT_PREFIX));
+
+        System.out.printf(PRINT_PASSENGER_FORMAT, "Number", "Passenger Info", "Sex", "Date Of Birth", "Passport Number");
+        System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT_DASHES), DASHES);
+
+        booking.getPassengers()
+                .stream()
+                .forEach(person -> {
+                    System.out.printf(PRINT_PASSENGER_FORMAT, booking.getPassengers().indexOf(person) + 1 + " of " + booking.getPassengers().size(),
+                            person.getName().concat(" ").concat(person.getSurname()),
+                            person.getSex(),
+                            dateLongToString(person.getBirthDate(), DataUtil.DATE_FORMAT),
+                            ((Passenger) person).getPassportNumber());
+                    System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT_DASHES), DASHES);
                 });
     }
 
@@ -202,7 +230,7 @@ public class BookingController {
         if (bookings.size() > 0)
             bookings.forEach(booking -> {
                 System.out.print(bookings.indexOf(booking) + +1 + ". ");
-                printBooking(booking, format);
+                printBookingInfo(booking, format);
             });
     }
 

@@ -4,6 +4,7 @@ import com.project.booking.Booking.Flight;
 import com.project.booking.Constants.DataUtil;
 import com.project.booking.Services.FlightService;
 
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -149,12 +150,30 @@ public class FlightController implements DataUtil {
                 .forEach(flight -> {
                     flightService.getAllFlights().stream()
                             .filter(connectingFlight ->
-                                            destination.equalsIgnoreCase(connectingFlight.getDestination()) &&
-                                                    flight.getDestination().equalsIgnoreCase(connectingFlight.getOrigin()) &&
-                                                    connectingFlight.getDepartureDateTime() > flight.getDepartureDateTime()
-//                                            connectingFlight.getDepartureDateTime() > (flight.getDepartureDateTime() + flight.getEstFlightDuration()) &&
-//                                            connectingFlight.getDepartureDateTime() < (flight.getDepartureDateTime() + flight.getEstFlightDuration() + 12 * 60 * 60 * 1000) &&
-//                                            ((connectingFlight.getMaxNumSeats() - connectingFlight.getPassengersOnBoard()) >= passengersNumber)
+
+                                    destination.equalsIgnoreCase(connectingFlight.getDestination())
+                                            &&
+                                            flight.getDestination().equalsIgnoreCase(connectingFlight.getOrigin())
+                                            &&
+                                            Duration.between(
+                                                    Instant.ofEpochMilli(flight.getDepartureDateTime())
+                                                            .atZone(ZoneId.of(TIME_ZONE))
+                                                            .toLocalDateTime().plusNanos(flight.getEstFlightDuration()),
+                                                    Instant.ofEpochMilli(connectingFlight.getDepartureDateTime())
+                                                            .atZone(ZoneId.of(TIME_ZONE))
+                                                            .toLocalDateTime()
+                                            ).compareTo(Duration.ofMinutes(LAYOVER_TIME_MIN_MINS)) >= 0
+                                            &&
+                                            Duration.between(
+                                                    Instant.ofEpochMilli(flight.getDepartureDateTime())
+                                                            .atZone(ZoneId.of(TIME_ZONE))
+                                                            .toLocalDateTime().plusNanos(flight.getEstFlightDuration()),
+                                                    Instant.ofEpochMilli(connectingFlight.getDepartureDateTime())
+                                                            .atZone(ZoneId.of(TIME_ZONE))
+                                                            .toLocalDateTime()
+                                            ).compareTo(Duration.ofHours(LAYOVER_TIME_MAX_HRS)) <= 0
+                                            &&
+                                            (connectingFlight.getMaxNumSeats() - connectingFlight.getPassengersOnBoard()) >= passengersNumber
 
                             ).forEach(connectingFlight -> {
 
@@ -170,31 +189,35 @@ public class FlightController implements DataUtil {
 
     }
 
-    public void displayFlightInformationWithSeats(Flight flight, int flightIndex, int flightCount) {
-        final String PRINT_FORMAT = "| %-7s | %-10s | %-5s | %-30s | %8s | %15s |\n";
+    public void displayFlightInformationWithSeats(Flight flight, int flightIndex, int flightCount, String printFormatPrefix) {
+        final String PRINT_FORMAT = printFormatPrefix.concat("| %-7s | %-10s | %-5s | %-18s | %-18s | %8s | %6s |\n");
         final String DASHES = new String(new char[94]).replace("\0", "-");
+        final String PRINT_FORMAT_DASHES = printFormatPrefix.concat("%s\n");
 
         if (flightIndex == 1) {
-            System.out.printf("%s\n", "Flight information:");
-            System.out.printf("%s\n", DASHES);
+            System.out.printf(PRINT_FORMAT_DASHES, "Flight information:");
+            System.out.printf(PRINT_FORMAT_DASHES, DASHES);
 
             System.out.printf(PRINT_FORMAT,
-                    "Flight", "Date", "Time", "Destination", "Duration", "Available Seats");
-            System.out.printf("%s\n", DASHES);
+                    "Flight", "Date", "Time", "Origin", "Destination", "Duration", "Av.Sts");
+            System.out.printf(PRINT_FORMAT_DASHES, DASHES);
         }
         printFlightWithSeats(flight, PRINT_FORMAT, 1);
-        if (flightIndex == flightCount) {System.out.printf("%s\n", DASHES);}
+        if (flightIndex == flightCount) {
+            System.out.printf(PRINT_FORMAT_DASHES, DASHES);
+        }
     }
 
     public void printFlightWithSeats(Flight flight, String format, int index) {
         if (flight != null && format.length() > 0)
             if (index > 1) {
-                format = "   " + format;
+                format = "   ->" + format;
             }
         System.out.printf(format,
                 flight.getFlightNumber(),
                 dateLongToString(flight.getDepartureDateTime(), DATE_FORMAT),
                 dateLongToString(flight.getDepartureDateTime(), TIME_FORMAT),
+                flight.getOrigin(),
                 flight.getDestination(),
                 timeOfDayLongToString(flight.getEstFlightDuration()),
                 flight.getMaxNumSeats() - flight.getPassengersOnBoard()
@@ -224,7 +247,7 @@ public class FlightController implements DataUtil {
     public void printMultipleFlightsWithOrderNumbers(List<List<Flight>> flights, String format) {
         if (flights.size() > 0)
             flights.forEach(flight -> {
-                System.out.print(flights.indexOf(flight) + +1 + ". ");
+                System.out.printf("%3d. ", flights.indexOf(flight) + +1);
                 AtomicInteger index = new AtomicInteger();
                 flight.forEach(item -> printFlightWithSeats(item, format, index.addAndGet(1)));
             });
@@ -233,17 +256,20 @@ public class FlightController implements DataUtil {
     public void printListFlightsdResultMenu(List<List<Flight>> flights) {
         System.out.println("Found flights matched criteria...");
 
-        final String PRINT_FORMAT = "| %-7s | %-10s | %-5s | %-30s | %8s | %15s |\n";
+        final String PRINT_FORMAT_PREFIX = "     ";
+        final String PRINT_FORMAT = "| %-7s | %-10s | %-5s | %-18s | %-18s | %8s | %6s |\n";
         final String DASHES = new String(new char[94]).replace("\0", "-");
+        final String PRINT_FORMAT_DASHES = "%s\n";
 
-        System.out.printf("   %s\n   ", DASHES);
-        System.out.printf(
-                PRINT_FORMAT,
-                "Flight", "Date", "Time", "Destination", "Duration", "Available Seats");
-        System.out.printf("   %s\n", DASHES);
+        System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT_DASHES), DASHES);
+
+        System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT),
+                "Flight", "Date", "Time", "Origin", "Destination", "Duration", "Av.Sts");
+        System.out.printf(PRINT_FORMAT_PREFIX.concat(PRINT_FORMAT_DASHES), DASHES);
 
         printMultipleFlightsWithOrderNumbers(flights, PRINT_FORMAT);
 
-        System.out.println("0.   Return to the main menu.");
+        System.out.println("  0.   Return to the main menu.");
+
     }
 }

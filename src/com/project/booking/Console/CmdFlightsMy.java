@@ -4,6 +4,7 @@ import com.project.booking.Booking.Booking;
 import com.project.booking.Controllers.Storage;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import static com.project.booking.Constants.ComUtil.parseAndValidateInputString;
@@ -49,7 +50,12 @@ public class CmdFlightsMy extends CommandBase implements Command {
 
         List<Booking> bookings = storage.getBookings().getAllBookingsByNameAndSurname(name, surname);
         if (bookings.size() > 0 ) {
-            bookings.forEach(booking -> storage.getBookings().displayBookingInfo(booking));
+
+            AtomicInteger index = new AtomicInteger(0);
+            bookings.forEach(booking -> {
+                System.out.printf("%d. ", index.addAndGet(1));
+                storage.getBookings().displayBookingInfo(booking);
+            });
         } else {
             System.out.printf("There is no booking on name=%s and surname=%s in data .\n", name, surname);
         }
