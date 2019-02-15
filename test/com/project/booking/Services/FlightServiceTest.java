@@ -126,16 +126,4 @@ public class FlightServiceTest {
 
     }
 
-
-    @Test
-    public void deleteFlightByIndex() {
-    }
-
-    @Test
-    public void count() {
-    }
-
-    @Test
-    public void getFlightById() {
-    }
 }

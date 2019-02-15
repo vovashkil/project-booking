@@ -37,7 +37,7 @@ public class CmdFlightInfo extends CommandBase implements Command {
         Flight flight = storage.getFlights().getByFlightNumber(Airports.KBP.getName(), flightNumber);
 
         if (flight != null) {
-            storage.getFlights().displayFlightInformationWithSeats(flight, 1, 1);
+            storage.getFlights().displayFlightInformationWithSeats(flight, 1, 1, "");
         } else {
             System.out.println("Sorry, there is no flight " + flightNumber + " in the data.");
             log.warning(String.format("No Information found about this flight: %s", flightNumber));
