@@ -32,7 +32,6 @@ public class CmdBookAdd extends CommandBase implements Command {
         log.info(String.format("%s executing", this.text()));
 
         System.out.println("Flight search and booking...");
-        Scanner input = new Scanner(System.in);
 
         List<List<Flight>> searchResult = storage.getFlights().searchFlightsForBooking(Airports.KBP.getName());
 
@@ -46,6 +45,7 @@ public class CmdBookAdd extends CommandBase implements Command {
 
                 int choiceSearchAndBooking;
                 try {
+                    Scanner input = new Scanner(System.in);
                     choiceSearchAndBooking = input.nextInt();
 
                 } catch (InputMismatchException e) {

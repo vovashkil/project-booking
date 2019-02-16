@@ -32,21 +32,20 @@ public class CmdFlightsMy extends CommandBase implements Command {
         log.info(String.format("%s executing", this.text()));
         System.out.println("Display my flights...");
 
-//        System.out.println("Enter personal data, please... ");
-//        String name = parseAndValidateInputString(
-//                "Name: ",
-//                "^[A-Z][A-Za-z ]+",
-//                "Name",
-//                "Vasia");
-//        String surname = parseAndValidateInputString(
-//                "Surname: ",
-//                "^[A-Z][A-Za-z ]+",
-//                "Surname",
-//                "Sidorov");
+        System.out.println("Enter personal data, please... ");
+        String name = parseAndValidateInputString(
+                "Name: ",
+                "^[A-Z][A-Za-z ]+",
+                "Name",
+                "Vasia");
+        String surname = parseAndValidateInputString(
+                "Surname: ",
+                "^[A-Z][A-Za-z ]+",
+                "Surname",
+                "Sidorov");
 
-        String name = storage.getUser().getName();
-        String surname = storage.getUser().getSurname();
-
+//        String name = storage.getUser().getName();
+//        String surname = storage.getUser().getSurname();
 
         List<Booking> bookings = storage.getBookings().getAllBookingsByNameAndSurname(name, surname);
         if (bookings.size() > 0 ) {
